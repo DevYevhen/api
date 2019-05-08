@@ -1,0 +1,30 @@
+trikoder_oauth2:
+    authorization_server:
+        # Full path to the private key file.
+        # to generate key use something like that:
+        # $ openssl genrsa [-passout pass:password] -out private.key 2048
+        private_key: "%env(resolve:OAUTH2_KEY_PATH)%/private.key"
+        # The string used as an encryption key. 
+        # generate it with something like that:
+        # $ php -r 'echo base64_encode(random_bytes(32)), PHP_EOL;'
+        encryption_key: "%env(OAUTH2_KEY_ENC)%"
+        #How long the issued access token should be valid for.
+        access_token_ttl: PT1H
+        # How long the issued refresh token should be valid for.
+        refresh_token_ttl: P1M
+
+    resource_server:
+        # Full path to the public key file
+        # Generate it with:
+        # openssl rsa -in private.key [ -passin pass:passphrase ] -pubout -out public.key
+        public_key: "%env(resolve:OAUTH2_KEY_PATH)%/public.key"
+
+    # Scopes that you wish to utilize.
+    # This should be a simple array of strings.
+    scopes: []
+
+    persistence:
+        doctrine:
+            # Name of the entity manager that you wish to use for managing clients and tokens.
+            entity_manager: default
+

@@ -1,0 +1,17 @@
+security:
+    providers:
+        in_memory:
+            memory: ~
+    firewalls:
+        dev:
+            pattern: '^/(_(profiler|wdt)|css|images|js)/'
+            security: false
+        api_token:
+            pattern: ^/api/token$
+            security: false
+        api:
+            pattern: ^/api
+            security: true
+            stateless: true
+            oauth2: true
+
