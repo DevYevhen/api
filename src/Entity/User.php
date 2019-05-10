@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Security\Core\User\UserInterface;
 use JMS\Serializer\Annotation as JMS;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Table(
@@ -28,6 +29,7 @@ class User implements UserInterface, \Serializable {
     /**
      * @ORM\Column(type="string", length=32, unique=true)
      * @JMS\Expose
+     * @Assert\NotBlank
      */
     private $username;
 
@@ -37,11 +39,19 @@ class User implements UserInterface, \Serializable {
     private $password;
 
     /**
+     * @Assert\NotBlank
+     * @Assert\Length(max=4096)
+     */
+    private $plainPassword;
+
+    /**
      * Uniq index of my sql version can be 767 bytes long.
      * UTF8MB4 uses 4 bytes max for single character, so max varchar
      * field with unique is limited to 767/4 chars.
      * @ORM\Column(type="string", length=191, unique=true)
      * @JMS\Expose
+     * @Assert\NotBlank
+     * @Assert\Email
      */
     private $email;
 
@@ -76,6 +86,10 @@ class User implements UserInterface, \Serializable {
         return $this->email;
     }
 
+    public function getPlainPassword() {
+        return $this->plainPassword;
+    }
+
     public function getPassword() {
         return $this->password;
     }
@@ -102,6 +116,12 @@ class User implements UserInterface, \Serializable {
         return $this;
     }
 
+    public function setPlainPassword($password) {
+        $this->plainPassword = $password;
+
+        return $this;
+    }
+
     public function setPassword($password) {
         $this->password = $password;
 
@@ -109,7 +129,7 @@ class User implements UserInterface, \Serializable {
     }
 
     public function getClientids() {
-        return $this->clientIds;
+        return $this->clientids->toArray();
     }
 
     public function addClientid(\Trikoder\Bundle\OAuth2Bundle\Model\Client $token) {

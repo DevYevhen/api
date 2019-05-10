@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="registration">
+  {{ form_start(form) }}
+  <div class="row">
+    {{ form_row(form.username) }}
+  </div>
+  <div class="row">
+    {{ form_row(form.email) }}
+  </div>
+  <div class="row">
+    {{ form_row(form.plainPassword.first) }}
+    {{ form_row(form.plainPassword.second) }}
+  </div>
+
+  <button type="submit">Register</button>
+  {{ form_end(form) }}
+<div>
+{% endblock body %}
+{#
+vim: sw=2:ts=2:ft=html.twig:expandtab:
+#}
+

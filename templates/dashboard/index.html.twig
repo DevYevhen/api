@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+</div>
+<h1>Credentials generator. Current user: {{ app.user.username }}.</h1>
+<button type="submin" id="generate">Generate Credentials</button>
+<style type="text/css">
+.hidden {
+  display: none;
+}
+</style>
+<div class="credentials hidden">
+  <p>Client ID: <span id="client_id"></span></p>
+  <p>Client secret: <span id="client_secret"></span></p>
+<script type="text/javascript">
+(function() {
+  const route = '/user/usercreds',
+    button=document.querySelector("#generate"),
+    cid = document.querySelector("#client_id"),
+    csec = document.querySelector("#client_secret"),
+    ccont = document.querySelector(".credentials");
+  
+  button.addEventListener('click', (e) => {
+    e.preventDefault();
+
+    const request = new Request(route, {method: 'POST', credentials: 'include'});
+
+    fetch(request)
+      .then( response =>  {
+        if( response.status === 200 ) {
+          return response.json();
+        } else {
+          throw new Error("Endpoint error:");
+        }
+      }).then(json => {
+        cid.innerHTML = json.client_id;
+        csec.innerHTML = json.client_secret;
+        ccont.classList.remove('hidden');
+      }).catch( error => {
+        console.error(error);
+      });
+
+  });
+})();
+</script>
+<div>
+{% endblock body %}
+{#
+vim: sw=2:ts=2:ft=html.twig:expandtab:
+#}
+

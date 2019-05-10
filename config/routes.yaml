@@ -16,6 +16,10 @@ quote:
     type: rest
     prefix: /api
     resource: App\Controller\QuoteController
+creds:
+    type: rest
+    prefix: /user
+    resource: App\Controller\CredentialsController
 #index:
 #    path: /
 #    defaults: { _controller: 'App\Controller\DefaultController::index' }

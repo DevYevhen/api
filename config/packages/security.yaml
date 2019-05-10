@@ -21,6 +21,7 @@ security:
             form_login:
                 login_path: login
                 check_path: login
+                default_target_path: user_dashboard
             provider: database
         api:
             pattern: ^/api
@@ -31,4 +32,5 @@ security:
 
     access_control:
         - { path: ^/user/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/api, roles: [ROLE_USER] }
+        - { path: ^/user/register, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/, roles: [ROLE_USER] }

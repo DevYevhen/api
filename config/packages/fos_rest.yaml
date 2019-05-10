@@ -15,4 +15,5 @@ fos_rest:
         enabled: true
         rules:
             - { path: ^/api, prefer_extension: true, fallback_format: json, priorities: [ json, xml ] }
+            - { path: ^/user/usercreds, prefer_extension: true, fallback_format: json, priorities: [ json, xml ] }
             - { path: '^/', priorities: [ 'html', '*/*'], fallback_format: ~, prefer_extension: true }
