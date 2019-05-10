@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use App\Entity\Author;
 use App\Entity\Quote;
 use App\Form\QuoteType;
 
@@ -71,10 +72,76 @@ class QuoteController extends FOSRestController {
 
         $user = $this->getUser();
 
-        $quote = $this->getDoctrine()->getRepository(Quote::class)
+        $resp = $this->getDoctrine()->getRepository(Quote::class)
             ->findBy(['owner' => $user->getId(), 'id' => $id]);
 
-        $view = $this->view($quote, 200);
+        $code = Response::HTTP_OK;
+        if(empty($resp)) {
+            $code = Response::HTTP_NOT_FOUND;
+            $resp = ['status' => 'Not found'];
+        }
+
+
+        $view = $this->view($resp, $code);
+        return $this->handleView($view);
+    }
+    /**
+     * Delete Quote by id
+     * @var $id quote id
+     */
+    public function deleteQuoteAction($id) {
+        $user = $this->getUser();
+        $quote = $this->getDoctrine()->getRepository(Quote::class)
+            ->findOneBy(['owner' => $user->getId(), 'id' => $id]);
+
+        $code = Response::HTTP_OK;
+        $resp = ['status' => 'success'];
+        if($quote) {
+            $em = $this->getDoctrine()->getManager();
+            $author = $quote->getAuthor();
+            $author->removeQuote($quote);
+            if(count($author->getQuotes()) <= 0) {
+                $em->remove($author);
+            }
+            $em->remove($quote);
+            $em->flush();
+        }  else {
+            $code = Response::HTTP_NOT_FOUND;
+            $resp = ['status' => 'not_found'];
+        }
+
+        $view = $this->view($resp, $code);
+        return $this->handleView($view);
+    }
+
+    /**
+     * Update Quote by id
+     * @var Request $req quote id
+     * @var integer $id quote id
+     */
+    public function putQuoteAction(Request $req, $id) {
+        $user = $this->getUser();
+        $quote = $this->getDoctrine()->getRepository(Quote::class)
+            ->findOneBy(['owner' => $user->getId(), 'id' => $id]);
+
+        $code = Response::HTTP_OK;
+        $resp = ['status' => 'success'];
+        if($quote) {
+            $form = $this->createForm(QuoteType::class, $quote);
+
+            $data = json_decode($req->getContent(), true);
+            $form->submit($data);
+            if($form->isSubmitted() && $form->isValid()) {
+                $em = $this->getDoctrine()->getManager();
+                $em->persist($quote);
+                $em->flush();
+            }
+        }  else {
+            $code = Response::HTTP_NOT_FOUND;
+            $resp = ['status' => 'not_found'];
+        }
+
+        $view = $this->view($resp, $code);
         return $this->handleView($view);
     }
 
@@ -85,14 +152,24 @@ class QuoteController extends FOSRestController {
      */
     public function postQuoteAction(Request $req) {
         $user = $this->getUser();
+        $data = json_decode($req->getContent(), true);
+        $author = null;
+
+        if(isset($data['author']) && isset($data['author']['name'])) {
+            $author = $this->getDoctrine()->getRepository(Author::class)
+                ->findOneBy(['owner' => $user->getId(), 'name' => $data['author']['name']]);
+        }
 
         $quote = new Quote();
+        if($author) {
+            $quote->setAuthor($author);
+        }
         $form = $this->createForm(QuoteType::class, $quote);
 
-        $data = json_decode($req->getContent(), true);
+
         $form->submit($data);
 
-        $quote->setOwner($user);
+        //$quote->setOwner($user);
 
         if($form->isSubmitted() && $form->isValid()) {
 

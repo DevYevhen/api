@@ -70,7 +70,7 @@ class Quote implements OwnedEntityInterface {
         return $this->author;
     }
 
-    public function setAuthor(\App\Entity\Author $author) {
+    public function setAuthor(\App\Entity\Author $author = null) {
         $this->author = $author;
         return $this;
     }
