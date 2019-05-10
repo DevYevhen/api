@@ -1,7 +1,12 @@
 security:
+    encoders:
+        App\Entity\User:
+            algorithm: bcrypt
+
     providers:
-        in_memory:
-            memory: ~
+        database:
+            entity:
+                class: App\Entity\User
     firewalls:
         dev:
             pattern: '^/(_(profiler|wdt)|css|images|js)/'
@@ -9,9 +14,21 @@ security:
         api_token:
             pattern: ^/api/token$
             security: false
+        main:
+            pattern: ^/user
+            security: true
+            anonymous: ~
+            form_login:
+                login_path: login
+                check_path: login
+            provider: database
         api:
             pattern: ^/api
             security: true
             stateless: true
-            oauth2: true
+            qa_oauth2: true
+            provider: database
 
+    access_control:
+        - { path: ^/user/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api, roles: [ROLE_USER] }

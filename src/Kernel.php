@@ -9,11 +9,18 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use Symfony\Component\Routing\RouteCollectionBuilder;
 
+use App\Security\Factory\OAuth2Factory;
+
 class Kernel extends BaseKernel
 {
     use MicroKernelTrait;
 
-    const CONFIG_EXTS = '.{php,xml,yaml,yml}';
+	const CONFIG_EXTS = '.{php,xml,yaml,yml}';
+
+	protected function build(ContainerBuilder $container) {
+		$extension = $container->getExtension('security');
+		$extension->addSecurityListenerFactory(new OAuth2Factory());
+	}
 
     public function getCacheDir()
     {
@@ -47,7 +54,8 @@ class Kernel extends BaseKernel
         $loader->load($confDir.'/{packages}/*'.self::CONFIG_EXTS, 'glob');
         $loader->load($confDir.'/{packages}/'.$this->environment.'/**/*'.self::CONFIG_EXTS, 'glob');
         $loader->load($confDir.'/{services}'.self::CONFIG_EXTS, 'glob');
-        $loader->load($confDir.'/{services}_'.$this->environment.self::CONFIG_EXTS, 'glob');
+		$loader->load($confDir.'/{services}_'.$this->environment.self::CONFIG_EXTS, 'glob');
+
     }
 
     protected function configureRoutes(RouteCollectionBuilder $routes)

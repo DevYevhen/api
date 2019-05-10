@@ -4,6 +4,18 @@
 oauth2:
     prefix: /api
     resource: '@TrikoderOAuth2Bundle/Resources/config/routes.xml'
+ping:
+    type: rest
+    prefix: /api
+    resource: App\Controller\PingController
+author:
+    type: rest
+    prefix: /api
+    resource: App\Controller\AuthorController
+quote:
+    type: rest
+    prefix: /api
+    resource: App\Controller\QuoteController
 #index:
 #    path: /
 #    defaults: { _controller: 'App\Controller\DefaultController::index' }
